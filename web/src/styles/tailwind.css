@@ -1,0 +1,350 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #F5F5F0;
+  --foreground: #1A1A1A;
+  --primary: #008751;
+  --primary-foreground: #FFFFFF;
+  --primary-dark: #005C37;
+  --primary-light: #E8F5EE;
+  --secondary: #003300;
+  --secondary-foreground: #FFFFFF;
+  --accent: #C8A951;
+  --accent-foreground: #1A1A1A;
+  --muted: #F0EFE8;
+  --muted-foreground: #6B6B5A;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --border: #D4D4C8;
+  --input: #FFFFFF;
+  --ring: #008751;
+  --radius: 4px;
+  --font-sans: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif;
+
+  /* Status colors */
+  --status-review: #D97706;
+  --status-review-bg: #FEF3C7;
+  --status-approved: #059669;
+  --status-approved-bg: #D1FAE5;
+  --status-rejected: #DC2626;
+  --status-rejected-bg: #FEE2E2;
+  --status-docverify: #2563EB;
+  --status-docverify-bg: #DBEAFE;
+  --status-moreinfo: #7C3AED;
+  --status-moreinfo-bg: #EDE9FE;
+
+  /* Government stripe */
+  --gov-stripe-green: #008751;
+  --gov-stripe-white: #FFFFFF;
+  --gov-stripe-black: #000000;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .gov-stripe {
+    height: 6px;
+    background: linear-gradient(
+      to right,
+      var(--gov-stripe-green) 0%,
+      var(--gov-stripe-green) 33.33%,
+      var(--gov-stripe-white) 33.33%,
+      var(--gov-stripe-white) 66.66%,
+      var(--gov-stripe-black) 66.66%,
+      var(--gov-stripe-black) 100%
+    );
+  }
+
+  .gov-header-bg {
+    background: linear-gradient(135deg, #003300 0%, #005C37 50%, #008751 100%);
+  }
+
+  .section-divider {
+    border-top: 3px solid var(--primary);
+    margin: 0;
+  }
+
+  .form-section-header {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--primary-foreground);
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: 2px 2px 0 0;
+  }
+
+  .form-section-body {
+    border: 1px solid var(--border);
+    border-top: none;
+    background: var(--card);
+    padding: 16px;
+    border-radius: 0 0 4px 4px;
+  }
+
+  @media (min-width: 640px) {
+    .form-section-body {
+      padding: 24px;
+    }
+  }
+
+  .notice-ticker {
+    animation: ticker 20s linear infinite;
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gold-text {
+    color: var(--accent);
+  }
+
+  .gov-watermark {
+    opacity: 0.04;
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .print-only {
+    display: none;
+  }
+
+  @media print {
+    .print-only { display: block; }
+    .no-print { display: none !important; }
+  }
+
+  .input-field {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+    font-size: 14px;
+    font-family: var(--font-sans);
+    background-color: var(--input);
+    color: var(--foreground);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    outline: none;
+  }
+
+  .input-field:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 135, 81, 0.15);
+  }
+
+  .input-field:disabled {
+    background-color: var(--muted);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .input-error {
+    border-color: var(--status-rejected) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+  }
+
+  .label-text {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 4px;
+    letter-spacing: 0.01em;
+  }
+
+  .helper-text {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    margin-top: 3px;
+  }
+
+  .error-text {
+    font-size: 12px;
+    color: var(--status-rejected);
+    margin-top: 3px;
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 24px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    transition: background-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(0, 135, 81, 0.3);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 9px 20px;
+    border-radius: var(--radius);
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--primary-light);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .status-under-review {
+    background-color: var(--status-review-bg);
+    color: var(--status-review);
+    border: 1px solid #FCD34D;
+  }
+
+  .status-approved {
+    background-color: var(--status-approved-bg);
+    color: var(--status-approved);
+    border: 1px solid #6EE7B7;
+  }
+
+  .status-rejected {
+    background-color: var(--status-rejected-bg);
+    color: var(--status-rejected);
+    border: 1px solid #FCA5A5;
+  }
+
+  .status-doc-verification {
+    background-color: var(--status-docverify-bg);
+    color: var(--status-docverify);
+    border: 1px solid #93C5FD;
+  }
+
+  .status-additional-info {
+    background-color: var(--status-moreinfo-bg);
+    color: var(--status-moreinfo);
+    border: 1px solid #C4B5FD;
+  }
+
+  .grant-card {
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--primary);
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+
+  .grant-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 135, 81, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--muted);
+    transition: background-color 150ms ease, border-color 150ms ease;
+    cursor: pointer;
+  }
+
+  .checkbox-item:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+  }
+
+  .checkbox-item input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .file-upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    background: var(--muted);
+    transition: border-color 150ms ease, background-color 150ms ease;
+    cursor: pointer;
+  }
+
+  .file-upload-zone:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+  }
+
+  .file-upload-zone.has-file {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+  }
+}
