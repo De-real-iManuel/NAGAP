@@ -66,19 +66,39 @@ export const fileStore = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Vercel Postgres client
+// Postgres connection client (using pg instead of @vercel/postgres)
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { Pool } from 'pg';
+
+let pool: Pool | null = null;
 let sql: ((strings: TemplateStringsArray, ...values: unknown[]) => Promise<{ rows: Record<string, unknown>[] }>) | null = null;
 
 async function getDb() {
   if (!process.env.POSTGRES_URL) return null;
   if (sql) return sql;
+
   try {
-    const { sql: pgSql } = await import('@vercel/postgres');
-    sql = pgSql as typeof sql;
+    pool = new Pool({
+      connectionString: process.env.POSTGRES_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+
+    sql = async (strings: TemplateStringsArray, ...values: unknown[]) => {
+      let queryText = '';
+      for (let i = 0; i < strings.length; i++) {
+        queryText += strings[i];
+        if (i < values.length) {
+          queryText += `$${i + 1}`;
+        }
+      }
+      const res = await pool!.query(queryText, values);
+      return { rows: res.rows };
+    };
+
     return sql;
-  } catch {
+  } catch (err) {
+    console.error('[DB] Failed to initialize pg Pool:', err);
     return null;
   }
 }
