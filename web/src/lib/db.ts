@@ -16,7 +16,11 @@ const DATA_FILE = path.join(process.cwd(), 'data', 'applications.json');
 
 function ensureDataDir() {
   const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  try {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  } catch (err) {
+    console.warn('[FileStore] Failed to ensure data directory (likely read-only file system):', err);
+  }
 }
 
 function readStore(): Record<string, Record<string, unknown>> {
@@ -31,7 +35,11 @@ function readStore(): Record<string, Record<string, unknown>> {
 
 function writeStore(store: Record<string, Record<string, unknown>>) {
   ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), 'utf-8');
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[FileStore] Failed to write to store (read-only file system):', err);
+  }
 }
 
 export const fileStore = {
