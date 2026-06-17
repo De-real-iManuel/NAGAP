@@ -130,12 +130,11 @@ export async function POST(request: NextRequest) {
         `;
         console.log(`[DB] Saved application ${applicationReference} to Postgres`);
       } catch (dbErr) {
-        console.error('[DB] Postgres write failed, saving to file store:', dbErr);
-        // Fall through to file store
-        fileStore.set(applicationReference, application as Record<string, unknown>);
+        console.error('[DB] Postgres write failed:', dbErr);
+        throw dbErr; // Let the global error handler process database issues, rather than writing to fileStore
       }
     } else {
-      // No Postgres — persist to file store
+      // No Postgres — persist to file store (local development environment)
       fileStore.set(applicationReference, application as Record<string, unknown>);
       console.log(`[FileStore] Saved application ${applicationReference}`);
     }
