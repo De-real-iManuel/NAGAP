@@ -44,17 +44,21 @@ function writeStore(store: Record<string, Record<string, unknown>>) {
 
 export const fileStore = {
   get(ref: string) {
+    if (process.env.POSTGRES_URL) return null;
     return readStore()[ref] ?? null;
   },
   set(ref: string, data: Record<string, unknown>) {
+    if (process.env.POSTGRES_URL) return;
     const store = readStore();
     store[ref] = data;
     writeStore(store);
   },
   getAll(): Record<string, unknown>[] {
+    if (process.env.POSTGRES_URL) return [];
     return Object.values(readStore());
   },
   delete(ref: string) {
+    if (process.env.POSTGRES_URL) return;
     const store = readStore();
     delete store[ref];
     writeStore(store);
