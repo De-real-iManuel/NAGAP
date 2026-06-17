@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Icon from '@/components/ui/AppIcon';
@@ -113,7 +113,6 @@ export default function ApplicationDetailModal({ application: app, onClose, onSt
                 { label: 'Smallholder', val: app.isSmallholderFarmer },
                 { label: 'Youth Farmer', val: app.isYouthFarmer },
                 { label: 'Woman Farmer', val: app.isWomanFarmer },
-                { label: 'Loan Default', val: app.hasExistingLoanDefault },
               ].map((item) => (
                 <div key={item.label} className="bg-muted rounded p-2">
                   <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -132,9 +131,27 @@ export default function ApplicationDetailModal({ application: app, onClose, onSt
               <div className="grid grid-cols-2 gap-2">
                 {Object.entries(app.documents).map(([key, val]) => (
                   <div key={key} className="flex items-center gap-2 bg-muted rounded px-3 py-2">
-                    <Icon name={val ? 'Yes' : 'No'} size={14} className={val ? 'Yes' : 'No'} />
-                    <span className="text-xs text-foreground">{key}</span>
-                    {val && <span className="text-xs text-muted-foreground truncate ml-auto">{val}</span>}
+                    <Icon
+                      name={val ? 'CheckCircleIcon' : 'XCircleIcon'}
+                      size={16}
+                      className={val ? 'text-green-600' : 'text-red-500'}
+                    />
+                    <span className="text-xs text-foreground font-medium">
+                      {key === 'ninDocument' && 'NIN Slip'}
+                      {key === 'cacDocument' && 'CAC Certificate'}
+                      {key === 'bankStatement' && 'Bank Statement'}
+                      {key === 'landDocument' && 'Land Document'}
+                      {!['ninDocument', 'cacDocument', 'bankStatement', 'landDocument'].includes(key) && key}
+                    </span>
+                    {val ? (
+                      <span className="text-xs text-primary font-semibold truncate ml-auto select-all max-w-[150px]" title={val}>
+                        {val}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground italic ml-auto">
+                        Not Provided
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
