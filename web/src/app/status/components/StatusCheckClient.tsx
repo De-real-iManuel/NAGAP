@@ -26,7 +26,7 @@ const statusConfig: Record<string, { label: string; className: string; icon: str
     label: 'Document Verification',
     className: 'status-doc-verification',
     icon: 'DocumentMagnifyingGlassIcon',
-    description: 'Your documents are being verified against NIMC, CBN CRMS, and CAC databases. You may be contacted if additional documents are required.',
+    description: 'Your documents are being verified against NIMC and CAC databases by our grant verification team. You may be contacted if additional documents are required.',
   },
   approved: {
     label: 'Approved',
@@ -186,31 +186,7 @@ export default function StatusCheckClient() {
               <Icon name="LockClosedIcon" size={12} className="inline mr-1 text-primary" />
               Your query is encrypted and your data is protected under NDPR 2019.
             </p>
-          </div>
-
-          {/* Demo hint */}
-          <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-3">
-            <p className="text-xs font-bold text-blue-800 mb-1">Demo References</p>
-            <div className="space-y-1">
-              {[
-                { ref: 'NAGAP-A3K8M2', email: 'adaeze.okonkwo@gmail.com', status: 'Document Verification' },
-                { ref: 'NAGAP-B7X9P4', email: 'emeka.nwosu@yahoo.com', status: 'Approved' },
-              ].map((demo) => (
-                <button
-                  key={`demo-${demo.ref}`}
-                  onClick={() => {
-                    setReferenceNumber(demo.ref);
-                    setFarmerEmail(demo.email);
-                  }}
-                  className="w-full text-left bg-white border border-blue-200 rounded px-2 py-1.5 hover:bg-blue-50 transition-colors"
-                >
-                  <p className="text-xs font-bold text-blue-700 font-mono">{demo.ref}</p>
-                  <p className="text-xs text-blue-600">{demo.status}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+          </div>        </div>
       </div>
 
       {/* Results area */}
@@ -316,7 +292,7 @@ export default function StatusCheckClient() {
                   Next Steps for Approved Application
                 </p>
                 <ul className="space-y-1.5 text-xs text-green-700">
-                  <li className="flex items-start gap-1.5"><Icon name="ChevronRightIcon" size={10} className="mt-0.5 text-primary" />Visit your nearest BOA / CBN branch with your reference number and NIN.</li>
+                  <li className="flex items-start gap-1.5"><Icon name="ChevronRightIcon" size={10} className="mt-0.5 text-primary" />Contact the NAGAP office or your designated programme coordinator using your reference number and NIN.</li>
                   <li className="flex items-start gap-1.5"><Icon name="ChevronRightIcon" size={10} className="mt-0.5 text-primary" />Bring original copies of all documents submitted during application.</li>
                   <li className="flex items-start gap-1.5"><Icon name="ChevronRightIcon" size={10} className="mt-0.5 text-primary" />Disbursement will be made directly to your registered bank account within 5 working days.</li>
                 </ul>

@@ -22,7 +22,7 @@ export default function AboutSection() {
               The Nigerian Agricultural Grant Application Portal (NAGAP) was established by the Federal Ministry of Agriculture and Rural Development to digitalise and streamline access to agricultural financing for Nigerian farmers, cooperatives, and agribusinesses.
             </p>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Through NAGAP, eligible applicants can apply for grants and soft loans from multiple government programmes — including CBN, NIRSAL, BOA, FMARD, and IFAD — through a single unified platform, eliminating the need to visit multiple offices.
+              Through NAGAP, eligible applicants can apply for agricultural grants from government and international development programmes — including IFAD, FMARD, USAID, and global NGO partners — through a single unified platform, eliminating the need to visit multiple offices.
             </p>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
@@ -69,7 +69,7 @@ export default function AboutSection() {
 
             <div className="mt-5 pt-4 border-t border-border">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                NAGAP operates under the authority of the Federal Ministry of Agriculture and Rural Development (FMARD) in collaboration with the Central Bank of Nigeria (CBN), NIRSAL Plc, Bank of Agriculture (BOA), and international development partners.
+                NAGAP operates under the authority of the Federal Ministry of Agriculture and Rural Development (FMARD) in collaboration with IFAD, USAID, FAO, AGRA, and other international development partners, to deliver agricultural grants to Nigerian smallholder farmers.
               </p>
             </div>
           </div>

@@ -143,7 +143,7 @@ export default function Header() {
           </span>
           <div className="overflow-hidden flex-1">
             <p className="notice-ticker text-xs whitespace-nowrap text-green-100">
-              2026 Grant Window is OPEN — CBN Anchor Borrowers Programme, NIRSAL AGSMEIS, BOA Micro-Agriculture Loan, FMARD APPEALS, and IFAD VCDP are now accepting applications. Deadline: 31st August 2026. Apply before the window closes.
+              2026 Grant Window is OPEN — IFAD VCDP Grant, FMARD APPEALS Grant, USAID Feed the Future, AGRA Smallholder Farmer Grant, and FAO Smallholder Agricultural Grant are now accepting applications from Nigerian farmers. Deadline: 31st August 2026. Apply before the window closes.
             </p>
           </div>
         </div>

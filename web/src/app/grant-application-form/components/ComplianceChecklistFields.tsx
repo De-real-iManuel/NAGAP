@@ -16,20 +16,23 @@ const checklistItems = [
     description: 'A BVN is required for all applicants. Contact any Nigerian bank branch to enrol.',
     required: true,
     icon: 'FingerPrintIcon',
+    isWarning: false,
   },
   {
     id: 'hasCACRegistration' as keyof ApplicationFormData,
     label: 'My business is registered with the Corporate Affairs Commission (CAC)',
-    description: 'Required for NIRSAL AGSMEIS and BOA SME loans. Not required for individual smallholder applications.',
+    description: 'Required for corporate or NGO-backed applications. Not required for individual smallholder grants.',
     required: false,
     icon: 'BuildingOfficeIcon',
+    isWarning: false,
   },
   {
     id: 'isMemberOfCooperative' as keyof ApplicationFormData,
     label: 'I am a member of a registered cooperative society',
-    description: 'Cooperative membership improves eligibility for CBN Anchor Borrowers Programme. Provide cooperative registration number.',
+    description: 'Cooperative membership improves eligibility for government and international NGO grant distributions.',
     required: false,
     icon: 'UsersIcon',
+    isWarning: false,
   },
   {
     id: 'hasLandDocument' as keyof ApplicationFormData,
@@ -37,13 +40,15 @@ const checklistItems = [
     description: 'Land documentation strengthens your application. Upload in Section 5 below.',
     required: false,
     icon: 'DocumentTextIcon',
+    isWarning: false,
   },
   {
     id: 'isSmallholderFarmer' as keyof ApplicationFormData,
     label: 'I am a smallholder farmer (farm size under 5 hectares)',
-    description: 'Smallholder status qualifies you for dedicated smallholder support programmes under the APPEALS and VCDP schemes.',
+    description: 'Smallholder status qualifies you for dedicated smallholder support programmes.',
     required: false,
     icon: 'HomeModernIcon',
+    isWarning: false,
   },
   {
     id: 'isYouthFarmer' as keyof ApplicationFormData,
@@ -51,6 +56,7 @@ const checklistItems = [
     description: 'Youth farmers receive priority consideration and higher grant allocations under FMARD APPEALS.',
     required: false,
     icon: 'AcademicCapIcon',
+    isWarning: false,
   },
   {
     id: 'isWomanFarmer' as keyof ApplicationFormData,
@@ -58,14 +64,15 @@ const checklistItems = [
     description: 'Women-led farms receive dedicated support and quota allocations across all active grant programmes.',
     required: false,
     icon: 'HeartIcon',
+    isWarning: false,
   },
   {
-    id: 'hasExistingLoanDefault' as keyof ApplicationFormData,
-    label: 'I have an existing loan default recorded on the Credit Risk Management System (CRMS)',
-    description: 'Applicants with existing defaults may still apply but will be subject to additional review. Non-disclosure is a disqualifying offence.',
+    id: 'hasNoLoanDefault' as keyof ApplicationFormData,
+    label: 'I confirm that I do not have any active loan defaults',
+    description: 'Applicants with active loan defaults may not qualify for certain grant programmes. This confirmation is required for eligibility screening.',
     required: false,
-    isWarning: true,
-    icon: 'ExclamationTriangleIcon',
+    icon: 'CheckBadgeIcon',
+    isWarning: false,
   },
 ];
 
@@ -114,7 +121,7 @@ export default function ComplianceChecklistFields({ register }: Props) {
       <div className="bg-primary-light border border-primary/20 rounded p-3 mt-4">
         <p className="text-xs text-primary leading-relaxed">
           <Icon name="ShieldCheckIcon" size={14} className="inline mr-1" />
-          <strong>Data Protection Notice:</strong> Information provided in this compliance checklist will be cross-referenced with NIMC (NIN), CBN CRMS, CAC, and NIRSAL databases. Your data is protected under the Nigeria Data Protection Regulation (NDPR) 2019.
+          <strong>Data Protection Notice:</strong> Information provided in this compliance checklist will be cross-referenced with NIMC (NIN), CAC, and relevant government databases. Your data is protected under the Nigeria Data Protection Regulation (NDPR) 2019.
         </p>
       </div>
     </div>

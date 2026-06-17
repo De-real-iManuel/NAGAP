@@ -39,9 +39,9 @@
     "warning": "🚨 CRITICAL: DO NOT REMOVE OR MODIFY ABOVE DEPENDENCIES - Required for Next.js 15 TypeScript app functionality"
   },
   "scripts": {
-    "dev": "next dev -p 4028",
+    "dev": "next dev -p 4035",
     "build": "next build",
-    "start": "next dev -p 4028",
+    "start": "next dev -p 4035",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md,json}\"",
@@ -51,10 +51,13 @@
   "dependencies": {
     "@dhiwise/component-tagger": "^1.0.15",
     "@heroicons/react": "^2.2.0",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.2",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@vercel/blob": "latest",
     "@vercel/postgres": "latest",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.7.0",
     "next": "15.5.18",
     "react": "19.0.3",

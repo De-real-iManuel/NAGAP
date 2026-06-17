@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'NAGAP — Nigerian Agricultural Grant Application Portal',
   description:
-    'Apply for agricultural grants online through the official Nigerian Agricultural Grant Application Portal. CBN, NIRSAL, BOA, FMARD and IFAD programmes.',
+    'Apply for international agricultural grants online through the official Nigerian Agricultural Grant Application Portal. IFAD VCDP, FMARD APPEALS, USAID, FAO and AGRA programmes for smallholder farmers in Nigeria.',
   icons: {
     icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],
   },

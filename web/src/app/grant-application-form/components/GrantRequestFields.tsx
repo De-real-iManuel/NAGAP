@@ -10,13 +10,13 @@ interface Props {
 }
 
 const programMaxAmounts: Record<string, string> = {
-  'CBN Anchor Borrowers Programme': '₦5,000,000',
-  'NIRSAL AGSMEIS': '₦10,000,000',
-  'BOA Micro-Agriculture Loan': '₦1,500,000',
-  'BOA Small/Medium Agriculture Loan': '₦50,000,000',
-  'FMARD APPEALS': '₦3,000,000',
-  'IFAD VCDP': '₦2,500,000',
-  'State Ministry Program': 'Varies by state',
+  'IFAD VCDP Grant (International Fund for Agricultural Development)': '₦5,000,000',
+  'FMARD APPEALS Grant (FG / World Bank)': '₦6,000,000',
+  'USAID Feed the Future Grant': '₦10,000,000',
+  'Bill & Melinda Gates Foundation Agriculture Grant': '₦15,000,000',
+  'AGRA Smallholder Farmer Empowerment Grant': '₦8,000,000',
+  'FAO Smallholder Agricultural Grant (UN)': '₦4,500,000',
+  'State Ministry Agricultural Development Grant': '₦3,000,000',
 };
 
 export default function GrantRequestFields({ register, errors, grantPrograms }: Props) {

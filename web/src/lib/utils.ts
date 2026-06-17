@@ -85,13 +85,13 @@ export const NIGERIAN_STATES = [
 ];
 
 export const GRANT_PROGRAMS = [
-  'CBN Anchor Borrowers Programme',
-  'NIRSAL AGSMEIS',
-  'BOA Micro-Agriculture Loan',
-  'BOA Small/Medium Agriculture Loan',
-  'FMARD APPEALS',
-  'IFAD VCDP',
-  'State Ministry Program',
+  'IFAD VCDP Grant (International Fund for Agricultural Development)',
+  'FMARD APPEALS Grant (FG / World Bank)',
+  'USAID Feed the Future Grant',
+  'Bill & Melinda Gates Foundation Agriculture Grant',
+  'AGRA Smallholder Farmer Empowerment Grant',
+  'FAO Smallholder Agricultural Grant (UN)',
+  'State Ministry Agricultural Development Grant',
 ];
 
 export const FARM_TYPES = [

@@ -4,11 +4,11 @@ import AppLogo from '@/components/ui/AppLogo';
 import Icon from '@/components/ui/AppIcon';
 
 const ministryLinks = [
-  { label: 'Federal Ministry of Agriculture', href: '#' },
-  { label: 'Central Bank of Nigeria (CBN)', href: '#' },
-  { label: 'NIRSAL Plc', href: '#' },
-  { label: 'Bank of Agriculture (BOA)', href: '#' },
+  { label: 'Federal Ministry of Agriculture (FMARD)', href: '#' },
   { label: 'IFAD Nigeria', href: '#' },
+  { label: 'USAID Feed the Future', href: '#' },
+  { label: 'FAO Nigeria', href: '#' },
+  { label: 'AGRA (Alliance for a Green Revolution in Africa)', href: '#' },
 ];
 
 const quickLinks = [
@@ -38,7 +38,7 @@ export default function Footer() {
             Implementing Partners &amp; Ministries
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            {['FMARD', 'CBN', 'NIRSAL', 'BOA', 'IFAD', 'CAC', 'NASS']?.map((org) => (
+            {['FMARD', 'IFAD', 'USAID', 'FAO', 'AGRA', 'CAC', 'NASS']?.map((org) => (
               <div
                 key={`partner-${org}`}
                 className="w-16 h-16 rounded bg-green-900 border border-green-700 flex items-center justify-center"

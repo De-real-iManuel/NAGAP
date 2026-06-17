@@ -38,3 +38,6 @@ jest-test-results.json
 
 # Optional: if using TurboRepo or monorepo
 turbo/
+
+# Local development file-based data store (auto-created, not for git)
+data/

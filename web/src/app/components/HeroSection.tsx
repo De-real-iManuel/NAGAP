@@ -75,7 +75,7 @@ export default function HeroSection() {
               <span className="text-green-300 text-sm font-semibold">5 Grant Windows Open — 2026</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {['CBN ABP', 'NIRSAL AGSMEIS', 'BOA Micro', 'FMARD APPEALS', 'IFAD VCDP'].map((name) => (
+              {['IFAD VCDP', 'FMARD APPEALS', 'USAID FtF', 'AGRA Grant', 'FAO Grant'].map((name) => (
                 <div key={name} className="flex items-center gap-1.5 bg-white/5 rounded px-2 py-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
                   <span className="text-white text-xs font-medium">{name}</span>
@@ -93,11 +93,11 @@ export default function HeroSection() {
               </div>
               <div className="space-y-3">
                 {[
-                  { name: 'CBN Anchor Borrowers Programme', max: '₦5,000,000', deadline: '31 Aug 2026', open: true },
-                  { name: 'NIRSAL AGSMEIS', max: '₦10,000,000', deadline: '31 Aug 2026', open: true },
-                  { name: 'BOA Micro-Agriculture Loan', max: '₦1,500,000', deadline: '31 Aug 2026', open: true },
-                  { name: 'FMARD APPEALS', max: '₦3,000,000', deadline: '31 Aug 2026', open: true },
-                  { name: 'IFAD VCDP', max: '₦2,500,000', deadline: '31 Aug 2026', open: true },
+                  { name: 'IFAD VCDP Grant', max: '₦5,000,000', deadline: '31 Aug 2026', open: true },
+                  { name: 'FMARD APPEALS Grant', max: '₦6,000,000', deadline: '31 Aug 2026', open: true },
+                  { name: 'USAID Feed the Future Grant', max: '₦10,000,000', deadline: '31 Aug 2026', open: true },
+                  { name: 'AGRA Smallholder Grant', max: '₦8,000,000', deadline: '31 Aug 2026', open: true },
+                  { name: 'FAO Smallholder Grant', max: '₦4,500,000', deadline: '31 Aug 2026', open: true },
                 ].map((grant) => (
                   <div
                     key={`hero-grant-${grant.name}`}

@@ -27,7 +27,7 @@ export type ApplicationFormData = {
   isSmallholderFarmer: boolean;
   isYouthFarmer: boolean;
   isWomanFarmer: boolean;
-  hasExistingLoanDefault: boolean;
+  hasNoLoanDefault: boolean;
   additionalNotes: string;
   declarationAgreed: boolean;
 };
@@ -55,20 +55,20 @@ const INITIAL_FORM: ApplicationFormData = {
   isSmallholderFarmer: false,
   isYouthFarmer: false,
   isWomanFarmer: false,
-  hasExistingLoanDefault: false,
+  hasNoLoanDefault: true,
   additionalNotes: '',
   declarationAgreed: false,
 };
 
 const COMPLIANCE_ITEMS = [
   { id: 'hasBVN' as keyof ApplicationFormData, label: 'I have a Bank Verification Number (BVN)', description: 'A BVN is required for all applicants. Contact any Nigerian bank branch to enrol.', required: true, icon: 'FingerPrintIcon', isWarning: false },
-  { id: 'hasCACRegistration' as keyof ApplicationFormData, label: 'My business is registered with the Corporate Affairs Commission (CAC)', description: 'Required for NIRSAL AGSMEIS and BOA SME loans. Not required for individual smallholder applications.', required: false, icon: 'BuildingOfficeIcon', isWarning: false },
-  { id: 'isMemberOfCooperative' as keyof ApplicationFormData, label: 'I am a member of a registered cooperative society', description: 'Cooperative membership improves eligibility for CBN Anchor Borrowers Programme.', required: false, icon: 'UsersIcon', isWarning: false },
+  { id: 'hasCACRegistration' as keyof ApplicationFormData, label: 'My business is registered with the Corporate Affairs Commission (CAC)', description: 'Required for corporate or NGO-backed applications. Not required for individual smallholder grants.', required: false, icon: 'BuildingOfficeIcon', isWarning: false },
+  { id: 'isMemberOfCooperative' as keyof ApplicationFormData, label: 'I am a member of a registered cooperative society', description: 'Cooperative membership improves eligibility for government and international NGO grant distributions.', required: false, icon: 'UsersIcon', isWarning: false },
   { id: 'hasLandDocument' as keyof ApplicationFormData, label: 'I have a valid land document (Certificate of Occupancy / Right of Occupancy / Survey Plan)', description: 'Land documentation strengthens your application. Upload in Section 5 below.', required: false, icon: 'DocumentTextIcon', isWarning: false },
   { id: 'isSmallholderFarmer' as keyof ApplicationFormData, label: 'I am a smallholder farmer (farm size under 5 hectares)', description: 'Smallholder status qualifies you for dedicated smallholder support programmes.', required: false, icon: 'HomeModernIcon', isWarning: false },
   { id: 'isYouthFarmer' as keyof ApplicationFormData, label: 'I am a youth farmer (aged 18–35 years)', description: 'Youth farmers receive priority consideration and higher grant allocations under FMARD APPEALS.', required: false, icon: 'AcademicCapIcon', isWarning: false },
   { id: 'isWomanFarmer' as keyof ApplicationFormData, label: 'I am a woman farmer / my farm is woman-led', description: 'Women-led farms receive dedicated support and quota allocations across all active grant programmes.', required: false, icon: 'HeartIcon', isWarning: false },
-  { id: 'hasExistingLoanDefault' as keyof ApplicationFormData, label: 'I have an existing loan default recorded on the Credit Risk Management System (CRMS)', description: 'Applicants with existing defaults may still apply but will be subject to additional review.', required: false, icon: 'ExclamationTriangleIcon', isWarning: true },
+  { id: 'hasNoLoanDefault' as keyof ApplicationFormData, label: 'I confirm that I do not have any active loan defaults', description: 'Applicants with active loan defaults may not qualify for certain grant programmes. This confirmation is required for eligibility screening.', required: false, icon: 'CheckBadgeIcon', isWarning: false },
 ];
 
 const DOCUMENT_FIELDS = [
@@ -79,13 +79,13 @@ const DOCUMENT_FIELDS = [
 ];
 
 const PROGRAM_MAX_AMOUNTS: Record<string, string> = {
-  'CBN Anchor Borrowers Programme': '₦5,000,000',
-  'NIRSAL AGSMEIS': '₦10,000,000',
-  'BOA Micro-Agriculture Loan': '₦1,500,000',
-  'BOA Small/Medium Agriculture Loan': '₦50,000,000',
-  'FMARD APPEALS': '₦3,000,000',
-  'IFAD VCDP': '₦2,500,000',
-  'State Ministry Program': 'Varies by state',
+  'IFAD VCDP Grant (International Fund for Agricultural Development)': '₦5,000,000',
+  'FMARD APPEALS Grant (FG / World Bank)': '₦6,000,000',
+  'USAID Feed the Future Grant': '₦10,000,000',
+  'Bill & Melinda Gates Foundation Agriculture Grant': '₦15,000,000',
+  'AGRA Smallholder Farmer Empowerment Grant': '₦8,000,000',
+  'FAO Smallholder Agricultural Grant (UN)': '₦4,500,000',
+  'State Ministry Agricultural Development Grant': '₦3,000,000',
 };
 
 export default function ApplicationFormClient() {
@@ -181,7 +181,7 @@ export default function ApplicationFormClient() {
         isSmallholderFarmer: formData.isSmallholderFarmer,
         isYouthFarmer: formData.isYouthFarmer,
         isWomanFarmer: formData.isWomanFarmer,
-        hasExistingLoanDefault: formData.hasExistingLoanDefault,
+        hasNoLoanDefault: formData.hasNoLoanDefault,
         additionalNotes: formData.additionalNotes,
         documents: {
           ninDocument: uploadedFiles.ninDocument?.name ?? null,
@@ -437,7 +437,7 @@ export default function ApplicationFormClient() {
                 <div className="bg-primary-light border border-primary/20 rounded p-3 mt-4">
                   <p className="text-xs text-primary leading-relaxed">
                     <Icon name="ShieldCheckIcon" size={14} className="inline mr-1" />
-                    <strong>Data Protection Notice:</strong> Information provided will be cross-referenced with NIMC (NIN), CBN CRMS, CAC, and NIRSAL databases. Your data is protected under NDPR 2019.
+                    <strong>Data Protection Notice:</strong> Information provided will be cross-referenced with NIMC (NIN), CAC, and relevant government grant databases. Your data is protected under the Nigeria Data Protection Regulation (NDPR) 2019.
                   </p>
                 </div>
               </div>

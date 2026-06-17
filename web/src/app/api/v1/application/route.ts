@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateReferenceNumber } from '@/lib/utils';
+import { getDb, initializeSchema, mapDbRowToApplication, fileStore } from '@/lib/db';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -31,15 +32,10 @@ const ApplicationSchema = z.object({
   isSmallholderFarmer: z.boolean().optional(),
   isYouthFarmer: z.boolean().optional(),
   isWomanFarmer: z.boolean().optional(),
-  hasExistingLoanDefault: z.boolean().optional(),
+  hasNoLoanDefault: z.boolean().optional(),
   additionalNotes: z.string().optional(),
-  documents: z.record(z.string()).optional(),
+  documents: z.record(z.string(), z.any()).optional(),
 });
-
-// In-memory store for demo (Backend integration: replace with Vercel Postgres)
-// Backend integration point: import { getDb } from '@/lib/db';
-// and use SQL queries
-const applicationStore: Map<string, Record<string, unknown>> = new Map();
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,8 +62,83 @@ export async function POST(request: NextRequest) {
       adminNotes: null,
     };
 
-    // Backend integration: INSERT INTO nagap_applications (...) VALUES (...)
-    applicationStore.set(applicationReference, application);
+    // Try to save to Postgres if available
+    const db = await getDb();
+    if (db) {
+      try {
+        await initializeSchema();
+        await db`
+          INSERT INTO nagap_applications (
+            application_reference,
+            farmer_name,
+            farmer_email,
+            farmer_phone,
+            state_of_residence,
+            lga,
+            farm_location,
+            farm_type,
+            farm_size_hectares,
+            crop_or_livestock_types,
+            years_in_operation,
+            annual_revenue_ngn,
+            grant_program,
+            requested_funding_amount_ngn,
+            proposed_project_description,
+            has_bvn,
+            has_cac_registration,
+            is_member_of_cooperative,
+            has_land_document,
+            is_smallholder_farmer,
+            is_youth_farmer,
+            is_woman_farmer,
+            has_no_loan_default,
+            additional_notes,
+            documents,
+            status,
+            submitted_at,
+            updated_at
+          ) VALUES (
+            ${applicationReference},
+            ${data.farmerName},
+            ${data.farmerEmail},
+            ${data.farmerPhone},
+            ${data.stateOfResidence},
+            ${data.lga},
+            ${data.farmLocation},
+            ${data.farmType},
+            ${data.farmSizeHectares ?? null},
+            ${data.cropOrLivestockTypes ?? []},
+            ${data.yearsInOperation ?? null},
+            ${data.annualRevenueNGN ?? null},
+            ${data.grantProgram},
+            ${data.requestedFundingAmountNGN},
+            ${data.proposedProjectDescription},
+            ${data.hasBVN ?? false},
+            ${data.hasCACRegistration ?? false},
+            ${data.isMemberOfCooperative ?? false},
+            ${data.hasLandDocument ?? false},
+            ${data.isSmallholderFarmer ?? false},
+            ${data.isYouthFarmer ?? false},
+            ${data.isWomanFarmer ?? false},
+            ${data.hasNoLoanDefault ?? true},
+            ${data.additionalNotes ?? null},
+            ${JSON.stringify(data.documents ?? {})},
+            'under_review',
+            NOW(),
+            NOW()
+          );
+        `;
+        console.log(`[DB] Saved application ${applicationReference} to Postgres`);
+      } catch (dbErr) {
+        console.error('[DB] Postgres write failed, saving to file store:', dbErr);
+        // Fall through to file store
+        fileStore.set(applicationReference, application as Record<string, unknown>);
+      }
+    } else {
+      // No Postgres — persist to file store
+      fileStore.set(applicationReference, application as Record<string, unknown>);
+      console.log(`[FileStore] Saved application ${applicationReference}`);
+    }
 
     return NextResponse.json(
       {
@@ -82,7 +153,7 @@ export async function POST(request: NextRequest) {
       { status: 201, headers: CORS_HEADERS }
     );
   } catch (err) {
-    console.error('[POST /api/v1/applications]', err);
+    console.error('[POST /api/v1/application]', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500, headers: CORS_HEADERS }
@@ -91,15 +162,40 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  // Backend integration: require admin auth header; query DB with filters
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status');
   const state = searchParams.get('state');
 
-  let results = Array.from(applicationStore.values());
+  // Try Postgres first
+  const db = await getDb();
+  if (db) {
+    try {
+      await initializeSchema();
+      const result = await db`SELECT * FROM nagap_applications ORDER BY submitted_at DESC`;
+      let applications = result.rows.map(mapDbRowToApplication);
 
-  if (status) results = results.filter((a) => (a as Record<string, unknown>).status === status);
-  if (state) results = results.filter((a) => (a as Record<string, unknown>).stateOfResidence === state);
+      if (status) applications = applications.filter((a) => a.status === status);
+      if (state) applications = applications.filter((a) => a.stateOfResidence === state);
+
+      return NextResponse.json(
+        { applications, total: applications.length },
+        { status: 200, headers: CORS_HEADERS }
+      );
+    } catch (dbErr) {
+      console.warn('[DB] Postgres GET failed, using file store:', dbErr);
+    }
+  }
+
+  // Fallback: file store
+  let results = fileStore.getAll() as Record<string, unknown>[];
+  if (status) results = results.filter((a) => a.status === status);
+  if (state) results = results.filter((a) => a.stateOfResidence === state);
+  // Sort newest first
+  results.sort((a, b) => {
+    const aTime = a.submittedAt ? new Date(a.submittedAt as string).getTime() : 0;
+    const bTime = b.submittedAt ? new Date(b.submittedAt as string).getTime() : 0;
+    return bTime - aTime;
+  });
 
   return NextResponse.json(
     { applications: results, total: results.length },
@@ -110,6 +206,3 @@ export async function GET(request: NextRequest) {
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
-
-// Export store for use by other route handlers in same process
-export { applicationStore };

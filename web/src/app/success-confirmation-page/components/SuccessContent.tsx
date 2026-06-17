@@ -17,7 +17,7 @@ interface SubmissionData {
 const FALLBACK_DATA: SubmissionData = {
   applicationReference: 'NAGAP-DEMO01',
   farmerName: 'Applicant',
-  grantProgram: 'CBN Anchor Borrowers Programme',
+  grantProgram: 'IFAD VCDP Grant (International Fund for Agricultural Development)',
   submittedAt: new Date().toISOString(),
   status: 'under_review',
   requestedFundingAmountNGN: 0,
@@ -26,7 +26,7 @@ const FALLBACK_DATA: SubmissionData = {
 
 function formatNairaStatic(amount: number): string {
   const formatted = amount.toLocaleString('en-NG');
-  return `₦${formatted}`;
+  return `\u20a6${formatted}`;
 }
 
 function formatDateStatic(isoString: string): string {
@@ -47,13 +47,298 @@ const statusLabelMap: Record<string, string> = {
   additional_info_required: 'Additional Info Required',
 };
 
+// ─── PDF Generation ──────────────────────────────────────────────────────────
+async function generatePDF(data: SubmissionData, formattedDate: string, formattedAmount: string) {
+  const { jsPDF } = await import('jspdf');
+
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+  const PAGE_W = 210;
+  const MARGIN = 18;
+  const CONTENT_W = PAGE_W - MARGIN * 2;
+  const GREEN_DARK = [27, 94, 32] as [number, number, number];    // #1B5E20
+  const GREEN_MED  = [46, 125, 50] as [number, number, number];   // #2E7D32
+  const GREEN_LIGHT= [200, 230, 201] as [number, number, number]; // #C8E6C9
+  const GOLD       = [255, 193, 7] as [number, number, number];   // #FFC107
+  const GREY_BG    = [245, 245, 245] as [number, number, number];
+  const BORDER     = [220, 220, 220] as [number, number, number];
+  const TEXT_DARK  = [30, 30, 30] as [number, number, number];
+  const TEXT_MID   = [80, 80, 80] as [number, number, number];
+  const TEXT_LIGHT = [140, 140, 140] as [number, number, number];
+  const WHITE      = [255, 255, 255] as [number, number, number];
+
+  let y = 0;
+
+  // ── Header banner ──────────────────────────────────────────────────────────
+  doc.setFillColor(...GREEN_DARK);
+  doc.rect(0, 0, PAGE_W, 38, 'F');
+
+  // Gold top stripe
+  doc.setFillColor(...GOLD);
+  doc.rect(0, 0, PAGE_W, 3, 'F');
+
+  // Coat of arms placeholder (circle)
+  doc.setFillColor(...GREEN_MED);
+  doc.circle(MARGIN + 10, 19, 8, 'F');
+  doc.setFillColor(...GOLD);
+  doc.circle(MARGIN + 10, 19, 6, 'F');
+  doc.setFillColor(...GREEN_DARK);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('NG', MARGIN + 10, 20.5, { align: 'center' });
+
+  // Title text
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(180, 230, 180);
+  doc.text('FEDERAL REPUBLIC OF NIGERIA', MARGIN + 22, 13);
+
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('Nigerian Agricultural Grant Application Portal', MARGIN + 22, 21);
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(200, 240, 200);
+  doc.text('Federal Ministry of Agriculture & Rural Development (FMARD)', MARGIN + 22, 28);
+
+  // "OFFICIAL RECEIPT" badge on right
+  doc.setFillColor(...GOLD);
+  doc.roundedRect(PAGE_W - MARGIN - 36, 9, 36, 12, 2, 2, 'F');
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...GREEN_DARK);
+  doc.text('APPLICATION RECEIPT', PAGE_W - MARGIN - 18, 16.5, { align: 'center' });
+
+  // Gold bottom stripe
+  doc.setFillColor(...GOLD);
+  doc.rect(0, 35, PAGE_W, 3, 'F');
+
+  y = 48;
+
+  // ── Sub-header: "Application Acknowledgement" ──────────────────────────────
+  doc.setFillColor(...GREEN_LIGHT);
+  doc.rect(MARGIN, y, CONTENT_W, 10, 'F');
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...GREEN_DARK);
+  doc.text('APPLICATION ACKNOWLEDGEMENT RECEIPT', MARGIN + CONTENT_W / 2, y + 7, { align: 'center' });
+  y += 16;
+
+  // ── Reference number block ─────────────────────────────────────────────────
+  doc.setFillColor(...GREEN_DARK);
+  doc.roundedRect(MARGIN, y, CONTENT_W, 22, 3, 3, 'F');
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...GREEN_LIGHT);
+  doc.text('APPLICATION REFERENCE NUMBER', MARGIN + CONTENT_W / 2, y + 7, { align: 'center' });
+
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...GOLD);
+  doc.text(data.applicationReference, MARGIN + CONTENT_W / 2, y + 17, { align: 'center' });
+
+  y += 28;
+
+  // ── Applicant details grid ─────────────────────────────────────────────────
+  const COL2 = CONTENT_W / 2 + 2;
+  const COL1 = 0;
+
+  const statusLabel = statusLabelMap[data.status] ?? 'Under Review';
+
+  const detailRows: { label: string; value: string; wide?: boolean }[] = [
+    { label: 'Applicant Full Name', value: data.farmerName },
+    { label: 'State of Residence', value: data.stateOfResidence },
+    { label: 'Grant Programme Applied For', value: data.grantProgram, wide: true },
+    { label: 'Amount Requested', value: formattedAmount },
+    { label: 'Date & Time Submitted', value: formattedDate },
+    { label: 'Current Application Status', value: statusLabel },
+  ];
+
+  const ROW_H = 18;
+
+  for (let i = 0; i < detailRows.length; i++) {
+    const row = detailRows[i];
+    const isEven = i % 2 === 0;
+    const xOffset = (row.wide || isEven) ? MARGIN : MARGIN + COL2;
+    const boxW = row.wide ? CONTENT_W : CONTENT_W / 2 - 2;
+    const currentY = y + Math.floor(i / (row.wide ? 1 : 2)) * (ROW_H + 3);
+
+    if (row.wide) {
+      // Full-width row
+      doc.setFillColor(...GREY_BG);
+      doc.roundedRect(MARGIN, currentY, CONTENT_W, ROW_H, 1.5, 1.5, 'F');
+      doc.setDrawColor(...BORDER);
+      doc.roundedRect(MARGIN, currentY, CONTENT_W, ROW_H, 1.5, 1.5, 'S');
+
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...TEXT_LIGHT);
+      doc.text(row.label.toUpperCase(), MARGIN + 4, currentY + 5.5);
+
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...TEXT_DARK);
+      const lines = doc.splitTextToSize(row.value, CONTENT_W - 8);
+      doc.text(lines[0], MARGIN + 4, currentY + 13);
+    } else {
+      // Half-width
+      doc.setFillColor(...GREY_BG);
+      doc.roundedRect(xOffset, currentY, boxW, ROW_H, 1.5, 1.5, 'F');
+      doc.setDrawColor(...BORDER);
+      doc.roundedRect(xOffset, currentY, boxW, ROW_H, 1.5, 1.5, 'S');
+
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...TEXT_LIGHT);
+      doc.text(row.label.toUpperCase(), xOffset + 4, currentY + 5.5);
+
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...TEXT_DARK);
+      const lines = doc.splitTextToSize(row.value, boxW - 8);
+      doc.text(lines[0], xOffset + 4, currentY + 13);
+    }
+  }
+
+  // Calculate how many rows we drew
+  // Rows: name+state (1 pair), programme (1 wide), amount+date (1 pair), status+empty (1 pair) — with re-layout
+  // Let's do a simpler approach: 4 blocks each ROW_H + 3
+  y += 4 * (ROW_H + 3) + 8;
+
+  // ── "What Happens Next" section ────────────────────────────────────────────
+  doc.setFillColor(...GREEN_DARK);
+  doc.rect(MARGIN, y, CONTENT_W, 8, 'F');
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...WHITE);
+  doc.text('WHAT HAPPENS NEXT', MARGIN + 4, y + 5.8);
+  y += 12;
+
+  const steps = [
+    { num: '01', title: 'Application Acknowledgement', desc: 'You will receive an SMS and email confirmation within 30 minutes confirming your submission.', done: true },
+    { num: '02', title: 'Initial Review', desc: 'A NAGAP officer will review your application for completeness and eligibility (1–3 working days).' },
+    { num: '03', title: 'Document Verification', desc: 'Your uploaded documents will be verified against NIMC (NIN) and CAC databases (3–7 working days).' },
+    { num: '04', title: 'Grant Eligibility Assessment', desc: 'Forwarded to the relevant partner agency (FMARD/IFAD/USAID/FAO) for final scoring (5–10 working days).' },
+    { num: '05', title: 'Decision & Notification', desc: 'You will be notified of the final decision via SMS and email. If approved, disbursement instructions follow (10–15 working days).' },
+  ];
+
+  for (const step of steps) {
+    // Circle number
+    if (step.done) {
+      doc.setFillColor(...GREEN_MED);
+    } else {
+      doc.setFillColor(...GREY_BG);
+      doc.setDrawColor(...BORDER);
+    }
+    doc.circle(MARGIN + 5, y + 4, 4, step.done ? 'F' : 'FD');
+
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(step.done ? 255 : 120, step.done ? 255 : 120, step.done ? 255 : 120);
+    doc.text(step.done ? '\u2713' : step.num, MARGIN + 5, y + 5.5, { align: 'center' });
+
+    // Title
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...TEXT_DARK);
+    doc.text(step.title, MARGIN + 12, y + 3.5);
+
+    // Description
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...TEXT_MID);
+    const descLines = doc.splitTextToSize(step.desc, CONTENT_W - 14);
+    doc.text(descLines, MARGIN + 12, y + 9);
+
+    y += 7 + descLines.length * 4.5 + 2;
+  }
+
+  y += 4;
+
+  // ── Important notices ──────────────────────────────────────────────────────
+  // Anti-fraud (amber)
+  doc.setFillColor(255, 248, 225);
+  doc.roundedRect(MARGIN, y, CONTENT_W / 2 - 2, 22, 2, 2, 'F');
+  doc.setDrawColor(255, 193, 7);
+  doc.roundedRect(MARGIN, y, CONTENT_W / 2 - 2, 22, 2, 2, 'S');
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(120, 60, 0);
+  doc.text('⚠  Anti-Fraud Warning', MARGIN + 4, y + 6);
+
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 50, 0);
+  const fraudText = doc.splitTextToSize(
+    'NAGAP will NEVER ask you to pay a fee. Report demands for payment to EFCC: 0800-CALL-EFCC.',
+    CONTENT_W / 2 - 10
+  );
+  doc.text(fraudText, MARGIN + 4, y + 12);
+
+  // Contact (blue)
+  const col2X = MARGIN + CONTENT_W / 2 + 2;
+  doc.setFillColor(227, 242, 253);
+  doc.roundedRect(col2X, y, CONTENT_W / 2 - 2, 22, 2, 2, 'F');
+  doc.setDrawColor(100, 181, 246);
+  doc.roundedRect(col2X, y, CONTENT_W / 2 - 2, 22, 2, 2, 'S');
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(13, 71, 161);
+  doc.text('ℹ  Need Assistance?', col2X + 4, y + 6);
+
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(21, 101, 192);
+  doc.text('Helpline: 0800-624-27-64 (Free)', col2X + 4, y + 12);
+  doc.text('Email: support@nagap.gov.ng', col2X + 4, y + 17);
+
+  y += 28;
+
+  // ── Footer ─────────────────────────────────────────────────────────────────
+  const footerY = 285;
+
+  doc.setFillColor(...GREEN_DARK);
+  doc.rect(0, footerY, PAGE_W, 12, 'F');
+
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(180, 230, 180);
+  doc.text(
+    `NAGAP Portal · FMARD · Ref: ${data.applicationReference} · Generated: ${formatDateStatic(new Date().toISOString())}`,
+    PAGE_W / 2,
+    footerY + 4.5,
+    { align: 'center' }
+  );
+  doc.setTextColor(...GOLD);
+  doc.text(
+    'This is an automatically generated official acknowledgement. No physical signature required.',
+    PAGE_W / 2,
+    footerY + 9,
+    { align: 'center' }
+  );
+
+  // Gold bottom bar
+  doc.setFillColor(...GOLD);
+  doc.rect(0, 297, PAGE_W, 3, 'F');
+
+  doc.save(`NAGAP-Acknowledgement-${data.applicationReference}.pdf`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function SuccessContent() {
   const [data, setData] = useState<SubmissionData>(FALLBACK_DATA);
   const [formattedDate, setFormattedDate] = useState('');
   const [formattedAmount, setFormattedAmount] = useState('');
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   useEffect(() => {
-    // Backend integration: could also fetch fresh data from /api/v1/applications/[ref]
     try {
       const stored = sessionStorage.getItem('nagap_submission');
       if (stored) {
@@ -73,51 +358,18 @@ export default function SuccessContent() {
 
   const statusLabel = statusLabelMap[data.status] ?? 'Under Review';
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
-  const handleDownload = () => {
-    const content = [
-      '================================================================',
-      '  NIGERIAN AGRICULTURAL GRANT APPLICATION PORTAL (NAGAP)',
-      '  Federal Ministry of Agriculture & Rural Development',
-      '  Federal Republic of Nigeria',
-      '================================================================',
-      '',
-      '  APPLICATION ACKNOWLEDGEMENT RECEIPT',
-      '',
-      `  Reference Number : ${data.applicationReference}`,
-      `  Applicant Name   : ${data.farmerName}`,
-      `  Grant Programme  : ${data.grantProgram}`,
-      `  Amount Requested : ${formattedAmount}`,
-      `  State            : ${data.stateOfResidence}`,
-      `  Submitted On     : ${formattedDate}`,
-      `  Current Status   : ${statusLabel}`,
-      '',
-      '----------------------------------------------------------------',
-      '  NEXT STEPS',
-      '  1. Your application is now under review by NAGAP officers.',
-      '  2. Document verification will commence within 5 working days.',
-      '  3. You will be contacted via SMS and email within 10-15 working days.',
-      '  4. Keep this reference number safe for all future correspondence.',
-      '',
-      '  For enquiries: support@nagap.gov.ng | 0800-624-27-64',
-      '================================================================',
-      '  This is an automatically generated acknowledgement receipt.',
-      '  NAGAP does not charge fees. Report fraud to EFCC: 0800-CALL-EFCC',
-      '================================================================',
-    ].join('\n');
-
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `NAGAP-Acknowledgement-${data.applicationReference}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      await generatePDF(data, formattedDate, formattedAmount);
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('PDF generation failed. Please use the Print button as an alternative.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   return (
@@ -139,7 +391,7 @@ export default function SuccessContent() {
           </div>
         </div>
 
-        {/* Reference number card — primary robot target */}
+        {/* Reference number card */}
         <div className="bg-white border-2 border-primary rounded-lg overflow-hidden shadow-sm">
           {/* Card header */}
           <div className="gov-header-bg px-6 py-4 flex items-center justify-between">
@@ -160,7 +412,7 @@ export default function SuccessContent() {
             </div>
           </div>
 
-          {/* Reference number — id="applicationReference" for RPA robot */}
+          {/* Reference number */}
           <div className="px-6 py-6 border-b border-border">
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">
               Application Reference Number
@@ -173,9 +425,7 @@ export default function SuccessContent() {
                 {data.applicationReference}
               </span>
               <button
-                onClick={() => {
-                  navigator.clipboard.writeText(data.applicationReference);
-                }}
+                onClick={() => navigator.clipboard.writeText(data.applicationReference)}
                 className="p-2 rounded border border-border hover:bg-muted transition-colors"
                 title="Copy reference number"
               >
@@ -223,7 +473,6 @@ export default function SuccessContent() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">
                 Current Status
               </p>
-              {/* id="submissionStatus" — robot reads this element */}
               <span
                 id="submissionStatus"
                 className="status-badge status-under-review"
@@ -234,7 +483,7 @@ export default function SuccessContent() {
             </div>
           </div>
 
-          {/* Card footer */}
+          {/* Card footer with actions */}
           <div className="px-6 py-3 bg-muted border-t border-border flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
               <Icon name="ShieldCheckIcon" size={12} className="inline mr-1 text-primary" />
@@ -249,11 +498,21 @@ export default function SuccessContent() {
                 Print
               </button>
               <button
-                onClick={handleDownload}
-                className="btn-primary text-xs py-1.5 px-3 no-print"
+                onClick={handleDownloadPDF}
+                disabled={isGeneratingPDF}
+                className="btn-primary text-xs py-1.5 px-3 no-print disabled:opacity-60"
               >
-                <Icon name="ArrowDownTrayIcon" size={13} />
-                Download Receipt
+                {isGeneratingPDF ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Generating…
+                  </>
+                ) : (
+                  <>
+                    <Icon name="ArrowDownTrayIcon" size={13} />
+                    Download PDF
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -284,14 +543,14 @@ export default function SuccessContent() {
               {
                 step: '03',
                 title: 'Document Verification',
-                description: 'Your uploaded documents will be verified against NIMC (NIN), CBN CRMS, and CAC databases. You may be contacted for additional documents.',
+                description: 'Your uploaded documents will be verified against NIMC (NIN) and CAC databases. You may be contacted for additional documents.',
                 status: 'pending',
                 timeline: '3–7 working days',
               },
               {
                 step: '04',
-                title: 'Credit & Eligibility Assessment',
-                description: 'Your application is forwarded to the relevant partner agency (CBN/NIRSAL/BOA/FMARD) for credit assessment and final eligibility scoring.',
+                title: 'Grant Eligibility Assessment',
+                description: 'Your application is forwarded to the relevant partner agency (FMARD/IFAD/USAID/FAO) for grant eligibility assessment and final scoring.',
                 status: 'pending',
                 timeline: '5–10 working days',
               },
@@ -308,8 +567,8 @@ export default function SuccessContent() {
                   <div
                     className={[
                       'w-8 h-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0',
-                      item.status === 'complete' ?'bg-primary text-white'
-                        : item.status === 'active' ?'bg-amber-500 text-white' :'bg-muted text-muted-foreground border border-border',
+                      item.status === 'complete' ? 'bg-primary text-white'
+                        : item.status === 'active' ? 'bg-amber-500 text-white' : 'bg-muted text-muted-foreground border border-border',
                     ].join(' ')}
                   >
                     {item.status === 'complete' ? (
@@ -417,11 +676,21 @@ export default function SuccessContent() {
             Print Acknowledgement
           </button>
           <button
-            onClick={handleDownload}
-            className="w-full btn-primary justify-center text-sm"
+            onClick={handleDownloadPDF}
+            disabled={isGeneratingPDF}
+            className="w-full btn-primary justify-center text-sm disabled:opacity-60"
           >
-            <Icon name="ArrowDownTrayIcon" size={15} />
-            Download Receipt (.txt)
+            {isGeneratingPDF ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Generating PDF…
+              </>
+            ) : (
+              <>
+                <Icon name="ArrowDownTrayIcon" size={15} />
+                Download Receipt (PDF)
+              </>
+            )}
           </button>
           <Link
             href="/status"
@@ -475,7 +744,7 @@ export default function SuccessContent() {
         <div className="bg-muted border border-border rounded-lg p-4">
           <p className="text-xs text-muted-foreground leading-relaxed">
             <Icon name="InformationCircleIcon" size={12} className="inline mr-1 text-primary" />
-            This portal is operated by the Federal Ministry of Agriculture and Rural Development (FMARD) in partnership with CBN, NIRSAL, BOA, and IFAD. Applications are subject to the terms of the respective grant programme guidelines.
+            This portal is operated by the Federal Ministry of Agriculture and Rural Development (FMARD) in partnership with IFAD, USAID, FAO, AGRA, and international development partners. Applications are subject to the terms of the respective grant programme guidelines.
           </p>
         </div>
       </div>
